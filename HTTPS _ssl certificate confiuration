@@ -19,3 +19,20 @@ The value of <JAVA_HOME> can be found either via the java.home propertly under A
 <JAVA_HOME>/bin/keytool -import -alias jira.cardinalhealth.com -keystore <JAVA_HOME>/jre/lib/security/cacerts -file public.crt
 
 
+
+
+this is what solved my issue:
+1) Download the .crt file
+
+echo -n | openssl s_client -connect <your domain>:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > ~/<your domain>.crt
+
+    replace <your domain> with your domain (e.g. jossef.com)
+
+2) Apply the .crt file in Java's cacerts certificate store
+
+keytool -import -v -trustcacerts -alias <your domain> -file ~/<your domain>.crt -keystore <JAVA HOME>/jre/lib/security/cacerts -keypass changeit -storepass changeit
+
+    replace <your domain> with your domain (e.g. jossef.com)
+    replace <JAVA HOME> with your java home directory
+
+3) Hack it
