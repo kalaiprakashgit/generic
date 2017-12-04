@@ -1,0 +1,21 @@
+	convert the certificate to JKS format
+	copy the certificate to nodes and server.xml reference location
+	keep the keystore password and keypasswd same
+   /opt/atlassian/jira734/jre/bin/keytool -keypasswd -alias hostanme.com -new evXwhibV9egsV7H -keystore  /var/atlassian/application-data/jira/cert/hostname.com.pfx
+  change the server.xml
+  
+  Trusting nodes 
+  
+  openssl s_client -connect jira.cdfdlth.com:443 < /dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > public.crt
+  
+  openssl s_client -connect internal-jira-prod-elb-920475699.us-east-1.elb.amazonaws.com:443 < /dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > internal-jira-prod-elb-920475699.us-east-1.elb.amazonaws.com
+.crt
+
+•	Import the certificate:
+The value of <JAVA_HOME> can be found either via the java.home propertly under Administration > System Settings or in the path used by the Java process in the output of ps -ef | grep java.
+ <JAVA_HOME>/bin/keytool -import -alias <server_name> -keystore <JAVA_HOME>/jre/lib/security/cacerts -file public.crt
+
+
+<JAVA_HOME>/bin/keytool -import -alias jira.cardinalhealth.com -keystore <JAVA_HOME>/jre/lib/security/cacerts -file public.crt
+
+
