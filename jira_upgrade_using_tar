@@ -1,0 +1,120 @@
+
+#Oracle JRE configuration
+cd /tmp
+wget http://scstoolsweb/Install/java/jre-8u112-linux-x64.rpm
+chmod +x jre-8u112-linux-x64.rpm
+sudo rpm  -ivh jre-8u112-linux-x64.rpm
+sudo /usr/sbin/alternatives --install /usr/bin/java java /usr/java/jre1.8.0_112/bin/java 20000
+sudo /usr/sbin/alternatives --config java
+selct the java version
+cd /usr/lib/jvm
+ln -s jre jre1.8.0_112
+java -version 
+
+#confluence addon mode change to safe mode.
+
+
+#extract the installation directory & setup
+cd /opt/atlassian
+wget http://scstoolsweb/Install/JIRA/atlassian-jira-software-7.3.4.tar.gz
+chmod +x atlassian-jira-software-7.3.4.tar.gz
+tar -xzvf atlassian-jira-software-7.3.4.tar.gz
+mv atlassian-jira-software-7.3.4-standalone jira734
+chown -R root:root jira734
+chmod -R 775 jira734
+cd jira734
+chown -R jira:jira logs temp work
+ls -l
+
+#setup jira_home directory
+cd /var/atlassian/application-data/
+mkdir jira734
+echo "jira.autoexport=false"  > /var/atlassian/application-data/jira734/jira-config.properties
+chown -R jira:jira /var/atlassian/application-data/jira734
+
+
+#RUN JIRAtool
+/opt/atlassian/jira734/bin/config.sh
+rds-ecomm-jira-03.cqfssyoqfmkq.us-east-1.rds.amazonaws.com:5432
+jiradb
+5432
+jiradbuser
+Q2UtTdy86e
+chown -R jira:jira /var/atlassian/application-data/jira734
+
+
+#open other putty and setup jira sharedhome directory
+cd /data
+cp -rp jira726 jira734
+rm -rf /data/jira734/sharedhome/plugins/install*
+
+
+#JIRA-Upgrade 
+/opt/atlassian/jira734/bin/start-jira.sh
+
+#Checklog
+tail -100f /opt/atlassian/jira734/logs/catalina.out
+
+#Bring down node
+/opt/atlassian/jira734/bin/stop-jira.sh
+
+
+
+#copy the cluster.properties
+cp -rp /var/atlassian/application-data/jira726/cluster.properties        /var/atlassian/application-data/jira734/
+# modify new shared home path/data/jira/sharedhome/plugins/installed-plugins/
+vim  /var/atlassian/application-data/jira734/cluster.properties
+
+#copy plugin
+cp -rp /var/atlassian/application-data/jira734/plugins/installed-plugins/  /data/jira734/sharedhome/plugins/
+cp -rp /data/jira726/sharedhome/plugins/installed-plugins/*.jar /data/jira734/sharedhome/plugins/installed-plugins
+chown -R jira:jira   /data/jira734/sharedhome/plugins
+
+#JIRA-start & Indexing & Addon update
+/opt/atlassian/jira734/bin/start-jira.sh
+
+#confluence backup
+# Enable safe mode - addon
+cp -rp /opt/atlassian/confluence  /opt/atlassian/confluence_bkp1122
+cp -rp /var/atlassian/application-data/confluence  /var/atlassian/application-data/confluence_bkp1122
+cp -rp /data/confluence  /data/confluence_bkp1122
+#modify the database pointer to new RDS 
+
+#confluence Install
+cd /tmp
+wget https://www.atlassian.com/software/confluence/downloads/binary/atlassian-confluence-6.0.1-x64.bin
+chmod +x atlassian-confluence-6.0.1-x64.bin
+/tmp/atlassian-confluence-6.0.1-x64.bin
+
+#commands
+service jira stop
+service confluence2 stop
+
+clone update
+------------
+goto 205 machine
+cd /opt/atlassian
+tar -cvf jira734.tar jira734
+scp jira734.tar jiraadmin@10.201.40.169:/tmp
+
+goto 169 machine
+mv /tmp/jira734.tar  /opt/atlassian/
+cd /opt/atlassian/
+tar -xvf jira734.tar
+
+goto 205 machine
+cd /var/atlassian/application-data/
+tar -cvf jira734.tar jira734
+scp jira734.tar jiraadmin@10.201.40.169:/tmp
+
+goto 169 machine
+mv /tmp/jira734  /var/atlassian/application-data/
+cd /var/atlassian/application-data/
+tar -xvf jira734.tar
+
+/opt/atlassian/jira725/bin/stop-jira.sh
+/opt/atlassian/confluence/bin/stop-confluence.sh
+
+
+
+
