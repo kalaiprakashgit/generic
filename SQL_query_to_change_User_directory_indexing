@@ -1,4 +1,4 @@
-# SQL query to change User directory indexing
+# SQL query to change JIRA User directory indexing
 Step1 : LIST Directory_names
 
 select d.id, d.directory_name, m.list_index from cwd_directory d join cwd_app_dir_mapping m on d.id=m.directory_id;
