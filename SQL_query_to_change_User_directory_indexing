@@ -1,0 +1,36 @@
+# SQL query to change User directory indexing
+Step1 : LIST Directory_names
+
+select d.id, d.directory_name, m.list_index from cwd_directory d join cwd_app_dir_mapping m on d.id=m.directory_id;
+
+step2: UPDATE/SWAP directory indexing
+
+update cwd_app_dir_mapping set list_index = 0 where directory_id = 65538;
+update cwd_app_dir_mapping set list_index = 1 where directory_id = 37093377;
+
+
+step3 CHECK tThe Active of Confluence Internal directory  (optional)
+
+select id, directory_name, active from cwd_directory where id = 65538;
+
+
+step4 : Active directory
+
+update cwd_directory set active = 'T' where id = 65538;
+
+
+
+
+
+step 5:
+
+Reset password of admin user
+
+UPDATE cwd_user 
+SET credential =
+'x61Ey612Kl2gpFL56FT9weDnpSo4AV8j8+qx2AuTHdRyY036xxzTTrw10Wq3+4qQyB+XURPWx1ONxp3Y3pB37A==' 
+WHERE id=131073;
+
+
+
+https://confluence.atlassian.com/doc/connecting-to-crowd-or-jira-for-user-management-229838465.html
