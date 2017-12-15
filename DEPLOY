@@ -1,0 +1,93 @@
+#!/usr/bin/perl
+
+use strict;
+use Getopt::Long;
+
+my ($Region,$Version,$Block,$OptionName);
+my @regionList;
+my @componentList;
+my $status;
+my $temp;
+
+if(!@ARGV){
+ Usage();
+}
+
+my %optlist = ( "Region=s"      =>  \$Region, 
+                "Version=s"      =>  \$Version,
+                "Block=s"	=> \$Block,
+                "OptionName=s" => \$OptionName
+                );
+
+GetOptions(%optlist);
+        
+@regionList = ("MERGE1","MERGE2","MERGE3","MERGE4","DEV1","DEV2","DEV3","DEV4","DEV5","Pilot","PPS","QA1","QA2","QA3","QA4","STG","PRD","DEV1_AWS","DEV2_AWS","DEV3_AWS","DEV4_AWS","DEV5_AWS","QA1_AWS","QA2_AWS","QA3_AWS","QA4_AWS","PPS_AWS");
+@componentList=("ALL","NationalALL","IndependentALL","SPDALL","SS_SPDALL","AcuteALL","MobileALL","ThemeSkin","ThemeSkinRI","SPDThemeSkin","SS_SPDThemeSkin","SpecialtyOnlineTheme","SharedLib","InvoiceAppSharedLib","ReceivingSharedLib","SPDSharedLib","AccountPortlets","PHAccountPortlets","SPDAccountPortlets","OrderPortlets","PHOrderPortlets","SPDOrderPortlets","SS_SPDOrderPortlets","ProductPortlets","PHProductPortlets","SPDProductPortlets","SS_SPDProductPortlets","ProductReturnsPortlets","PHProductReturnsPortlets","SPDProductReturnsPortlets","ShoppingPortlets","PHShoppingPortlets","SPDShoppingPortlets","SS_SPDShoppingPortlets","WCMPortlets","PHAdminPortlets","ThemeSkinADMIN","RITheme","PHReportPortlets","SPDReportPortlets","CAHPHAccountPortlets","CAHPHOrderPortlets","CAHPHProductPortlets","CAHPHProductReturnsPortlets","CAHPHReportPortlets","CAHPHShoppingPortlets","CAHPHInvoiceApprovalPortlets","CAHPHWCMPortlets","CAHPHReceivingPortlets","CAHPHCommonServicesPortlets","CAHPHPhysicalInvPortlets","PhysicalInvSharedLib","CAHPHRequisitionPortlets","AcuteThemeSkin","AcuteTheme","CAHPHMobileAccountPortlets","CAHPHMobileOrderPortlets","CAHPHMobileProductPortlets","CAHPHMobileShoppingPortlets","CAHPHMobileReceivingPortlets","CAHPHMobilePhysicalInvPortlets","MobileThemeSkin","ALL_Acute_Mobile","AATheme","CAHPHAssistReportPortlets","CAHPHAssistAdminPortlets","CAHPHAssistProductPortlets","AssistALL","WebAnalytics","CAHPHIDBPortlets","IDBSharedLib","MngAcGrpsSharedLib","CAHPHManageAccountGroupsPortlets","AdobeTestTarget","csos","EDMPromotionPortlets","MedicalTheme","MedicalBlankTheme","MedicalAccountPortlets","MedicalShoppingPortlets","MedicalProductPortlets","MedicalOrderPortlets","MedicalProductReturnsPortlets","MedicalEDMPromotionPortlets","cachespec","IHSWebServer","MedicalSharedLib","MedicalALL","EndecaSharedLib","CAHPHAdminPortlets","CAHPHCIMPortlets");
+
+if(!($Region && $Version && $OptionName )){
+	Usage();
+}
+
+if (scalar( grep(/$Region/, @regionList))==0) {
+	print  "$Region is not a valid Region [only DEV1/QA1/DEV2/QA2/DEV3/QA3/DEV4/QA4/DEV5/Pilot/ is valid] .\n";
+	Usage();
+} 
+
+
+
+if (scalar( grep(/$OptionName/, @componentList))==0) {
+	print  "$OptionName is not a valid.[please check the OptionName that you passed and try again].\n";
+	Usage();
+} 
+
+
+#if ($Version !~ /^v/){
+#	print  "$Version is not a valid ClearCase stream version.\n";   
+#	Usage();                                                      
+#} 
+
+
+#if ($Block ne "" && $Block ne "Y" && $Block ne "N" ){    
+#	print "\n$Block is not a valid Block option\n";
+#	print "Valid options are Y/N \n\n";
+#	Usage();
+#}
+
+
+
+
+
+print "Running PWOPortalDeploy.pl \n\n";
+
+#Call ant from within the perl child process,
+#since the args parsed from the command line cannot be passed to the parent (batch) process env
+$status = system("call ant.bat -buildfile PWODeployPortal.xml  -DRegion=\"$Region\" -DOptionName=\"$OptionName\" -DVersion=\"$Version\" -DBlock=\"$Block\"");
+#$status = system("call ant.bat -buildfile clearcase.xml  -DRegion=\"$Region\" -DOptionName=\"$OptionName\" -DVersion=\"$Version\" -DBlock=\"$Block\"");
+exit $status;
+                                                         
+sub Usage(){
+	print "Usage  :\n";
+	print "    PWOPortalDeploy.bat -Region [DEV1|QA1] -OptionName [Portlet Name] -Version [CC_stream_version] [-Block [Y|N]] \n";
+	print "    Region        - (required)[DEV1/QA1] target build environment\n";
+	print "    OptionName   - (required)[Name of the portlet to build]\n";
+	print "                     OptionName 'ALL' will Deploy all portlets,sharedlib,themes,skins \n";
+	print "    Version       - (required) CC stream version (i.e. v01.0.0)\n";
+	print "    Block	 - (optional)[Y/N] Valid only for Prod \n\n";
+	print "Example:\n";
+	print "    PWOPortalDeploy.bat -Region DEV1 -OptionName ProductPortlets -Version 01.0.0  \n";
+	print "    PWOPortalDeploy.bat -Region QA1  -OptionName ALL -Version 01.0.0 -Block Y \n\n\n";
+	print "    PWOPortalDeploy.bat -Region QA1  -OptionName ShoppingPortlets -Version v01.0.0 -Block Y \n\n\n";
+	exit(1);        
+}                                                                                      
+ 
+
+
+
+
+
+
+
+
+
+
+
