@@ -1,0 +1,489 @@
+<?xml version="1.0" ?>
+
+
+<project name="common" default="CCMain" basedir=".">
+    <description>
+        Builds all the Common Compontents.
+    </description>
+
+	<variable name="destination.dir" value="${root.destination.dir}/${Version}/${Region}/${Portlet}/WorkSpace"/>
+	<property file="properties/projects/build_portal_common.properties"/>
+	
+	
+	<target name="prepare" >
+			<echo message="desination.dir value is ${destination.dir}" />	
+			
+			<tstamp>
+				<format property="BuildTime" pattern="yyyyMMdd'_'HHmm"/>
+			</tstamp>
+			<taskdef name="try" classname="ise.antelope.tasks.TryTask"/>
+			<mkdir dir="${destination.dir}"/> 
+			<mkdir dir="${archive.dir}" />
+			<delete>
+				 <fileset dir="${destination.dir}" includes="*.jar"/>
+				 <fileset dir="${destination.dir}" includes="*.tld"/>
+				 <fileset dir="${destination.dir}" includes="*.zip"/>
+			</delete>
+			<delete dir="${workspace.dir}/${Portlet}"/>
+			<delete file="${destination.dir}/${Portlet}"/>
+			<delete dir="${fortify.srvc.dir}"/>
+			<mkdir dir="${fortify.jars.dir}"/>
+			<mkdir dir="${fortify.src.dir}"/>
+    </target>
+	
+	
+	<target name="MEDSharedLib" depends="prepare">
+	<echo message="** MedicalSharedLib build from  ${common.dest.dir} to ${MEDsharedlib.dir}**"/>
+	<delete dir="${MEDsharedlib.dir}"/>
+    <mkdir dir="${MEDsharedlib.dir}" />		
+		<copy todir="${MEDsharedlib.dir}"  flatten="true">
+			<fileset dir="${common.dest.dir}">
+				<include name="*.jar"/>
+			</fileset>
+		</copy>	
+		
+			<copy todir="${MEDsharedlib.dir}"  flatten="true">
+				<fileset dir="${comarch.lib.dir}">
+					<include name="WebOrderingCommonProxyLib.jar"/>
+				</fileset>			
+			</copy>		
+		
+		<property name="Portlet" value="MedicalSharedLib"/>
+	<tstamp>
+      <format property="BuildTime" pattern="yyyyMMdd'_'HHmm"/>
+    </tstamp>
+    
+    <mkdir dir="${archive.dir}/${Version}/${Region}/${Portlet}/${BuildTime}"/>
+    <copy todir="${archive.dir}/${Version}/${Region}/${Portlet}/${BuildTime}">
+          <fileset dir="${MEDsharedlib.dir}" />
+    </copy>
+		
+	</target>
+
+   <target name="WebAnalytics" depends="prepare">
+    <delete dir="${WebAnalytics.dir}"/>
+    <mkdir dir="${WebAnalytics.dir}" />	
+		<copy todir="${WebAnalytics.dir}"  flatten="true">
+		<fileset dir="${svn.comarch.workspace}/Arch/WebAnalytics/WebServerConfig/">
+			<include name="*.js"/>
+		</fileset>     
+		</copy>
+		<property name="Portlet" value="WebAnalytics"/>
+
+	<tstamp>
+      <format property="BuildTime" pattern="yyyyMMdd'_'HHmm"/>
+    </tstamp>
+    
+    <mkdir dir="${archive.dir}/${Version}/${Region}/${Portlet}/${BuildTime}"/>
+    <copy todir="${archive.dir}/${Version}/${Region}/${Portlet}/${BuildTime}">
+          <fileset dir="${WebAnalytics.dir}" />
+    </copy>
+	</target> 
+	
+	<target name="AdobeTestTarget" depends="prepare">
+    <delete dir="${AdobeTestTarget.dir}"/>
+    <mkdir dir="${AdobeTestTarget.dir}" />	
+		<copy todir="${AdobeTestTarget.dir}"  flatten="true">
+		<fileset dir="${svn.comarch.workspace}/Arch/AdobeTestTarget/WebServerConfig/">
+			<include name="*.js"/>
+		</fileset>     
+		</copy>
+		<property name="Portlet" value="AdobeTestTarget"/>
+
+	<tstamp>
+      <format property="BuildTime" pattern="yyyyMMdd'_'HHmm"/>
+    </tstamp>
+    
+    <mkdir dir="${archive.dir}/${Version}/${Region}/${Portlet}/${BuildTime}"/>
+    <copy todir="${archive.dir}/${Version}/${Region}/${Portlet}/${BuildTime}">
+          <fileset dir="${AdobeTestTarget.dir}" />
+    </copy>
+	</target> 
+	
+	<target name="csos" depends="prepare">
+		<delete dir="${csos.dir}"/>
+		<mkdir dir="${csos.dir}" />	
+			<copy todir="${csos.dir}">
+				<fileset dir="${svn.comarch.workspace}/Common/ThirdPartyLib/csos"/>			
+			</copy>
+			<property name="Portlet" value="csos"/>
+
+		<tstamp>
+			<format property="BuildTime" pattern="yyyyMMdd'_'HHmm"/>
+		</tstamp>
+    
+		<mkdir dir="${archive.dir}/${Version}/${Region}/${Portlet}/${BuildTime}"/>
+		<copy todir="${archive.dir}/${Version}/${Region}/${Portlet}/${BuildTime}">
+			<fileset dir="${csos.dir}" />
+		</copy>
+	</target>
+	
+	
+
+  <target name="SharedLib" depends="prepare">
+  
+  <delete dir="${sharedlib.dir}"/>
+   <mkdir dir="${sharedlib.dir}/PortalServerConfig" />
+	<mkdir dir="${sharedlib.dir}/config" />
+	
+	<copy todir="${sharedlib.dir}"  flatten="true">
+		<fileset dir="${destination.dir}">
+			<include name="*.jar"/>
+		</fileset>
+		<fileset dir="${comarch.lib.dir}">
+			<include name="*.jar"/>
+		</fileset>
+		<fileset dir="${client.lib.dir}">
+			<include name="*Client.jar"/>
+			<include name="*Wrapper.jar"/>
+			<include name="GetGXSMappedObjectsClient.jar"/>
+			<include name="CimWebServiceClientUtil.jar"/>
+			<include name="ProductAlternatesServiceClient_JaxWs.jar"/>
+			<include name="ECMContentServiceClient_V2_1.jar"/> <!--added by sahitya , as per mail from sourabh sharma  17-02-2014 11:38 -->
+			<include name="GetPrchseHistClient-JAX-WS.jar"/>
+			<include name="OrdersService.jar"/>
+			<include name="GetMSDSServiceClient_v1_0.jar"/>  
+			<exclude name="PDFulfillmentAdapterEJBClient.jar"/>
+		</fileset>
+		<fileset dir="${comarch.lib.dir}">
+			<include name="*.properties"/>
+		</fileset>
+		<fileset dir="${cardinalalerter.lib.dir}">
+			<include name="*.jar"/>
+		</fileset>
+		<fileset dir="${log4j.lib.dir}">
+			<include name="*.jar"/>
+		</fileset>
+		<fileset dir="${facade.lib.dir}">
+			<include name="*.jar"/>
+			<exclude name="Foundation-Samples.jar"/> 
+		</fileset>
+		<fileset dir="${endeca.lib.dir}">
+			<include name="*.jar"/>
+		</fileset>  
+		<fileset dir="${common.dest.dir}">
+			<include name="*.jar"/>
+		</fileset>
+		<fileset dir="${highwire.lib.dir}">
+			<include name="*.jar" />
+			<include name="*.tld" />
+        </fileset>
+	    <fileset dir="${tld.dir}">
+			<include name="CustomReadOnlyTld.tld"/>
+			<include name="CustomStockHoverText.tld"/> <!-- 14.4.0 manish.a.mittal email 07212014 Madhu -->
+		</fileset>
+		 
+		
+		<!-- Not 13.2.1 - Reference bkp-12-2-14 -->
+		<fileset dir="${ITextPdf.lib.dir}">
+			<include name="*.jar" />			
+		</fileset>
+		
+		<fileset dir="${ApacheWink.lib.dir}">
+			<include name="*.jar" />
+			<exclude name="jaxb-api-2.2.jar" />
+			<exclude name="jaxb-impl-2.2.1.1.jar" />
+			<exclude name="activation-1.1.jar" />
+		<!--	<include name="httpclient-4.0.jar" />  madhu Mon 4/20/2015 1:08 PM  Lavesh's email  -->
+		<!--	<include name="httpcore-4.0.1.jar" /> -->
+		<!-- Commented by sahitya  May 04, 2015 12:28 PM   Lavesh's email  -->
+		</fileset>
+		<fileset dir="${Jackson.lib.dir}">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="${ApachePOI.lib.dir}">
+			<include name="poi-3.6.jar" />
+		</fileset>
+		<fileset dir="${ApacheFile.lib.dir}">
+	       <include name="*.jar"/>
+	    </fileset>
+		<fileset dir="${client.lib.dir}">
+			<include name="ProductAlternatesServiceClient_JaxWs.jar"/>
+		</fileset>
+		<fileset dir="${Apache.lib.dir}"> <!-- for 14.5.0 08142014 Madhu-->
+			<include name="*.jar" />
+			<include name="*.pem" />	<!-- for 14.5.0 08182014 sahitya-->			
+	    </fileset>		
+		<fileset dir="${crystal.dir}">
+			<include name="*.jar" />			
+		</fileset>	
+		
+    </copy>
+
+	<!-- Removed: ${AEMJCR.lib.dir}... Reference bkp-12-2-14 -->	  
+	  
+    <copy todir="${sharedlib.dir}/PortalServerConfig" >
+      <fileset dir="${svn.comarch.workspace}/Arch/WebOrderingPortal/PortalServerConfig/">
+           <include name="**/*.properties"/>
+      </fileset>
+    </copy>	
+	<copy todir="${sharedlib.dir}/config" >
+      <fileset dir="${facade.config.dir}/">
+           <include name="**/*.*"/>
+      </fileset>
+    </copy> 
+	
+	<!-- <if name="Version" value="15.2.7">
+		<mkdir dir="${sharedlib.dir}/ACWTPortalServerConfig" />
+		<copy todir="${sharedlib.dir}"  flatten="true">
+			<fileset dir="${client.lib.dir}">
+				<include name="ECMClientService.jar"/>
+			</fileset>
+		</copy> 
+		<copy todir="${sharedlib.dir}/ACWTPortalServerConfig" >
+			<fileset dir="${svn.comarch.workspace}/Arch/WebOrderingPortal/ACWTPortalServerConfig">
+			   <include name="**/*.properties"/>
+			</fileset>
+		</copy>	 
+	</if> -->
+	
+
+		<mkdir dir="${sharedlib.dir}/ACWTPortalServerConfig" />
+		<copy todir="${sharedlib.dir}"  flatten="true">
+			<fileset dir="${client.lib.dir}">
+				<include name="ECMClientService.jar"/> <!-- for 15.2.5 01242015 Madhu Shruti email-->
+			</fileset>
+		</copy> 
+		<copy todir="${sharedlib.dir}/ACWTPortalServerConfig" >
+			<fileset dir="${svn.comarch.workspace}/Arch/WebOrderingPortal/ACWTPortalServerConfig">
+			   <include name="**/*.properties"/>
+			</fileset>
+		</copy>	 
+		
+			<!-- Shriya 02272015 IM 5:41 PM Madhu below 3 jars-->
+		 <copy todir="${sharedlib.dir}"  flatten="true">	
+		<fileset dir="${ApachePOI.lib.dir}">
+			<include name="poi-3.10.1-20140818.jar" />
+			<include name="poi-ooxml-3.10-FINAL.jar" />
+			<include name="poi-ooxml-schemas-3.10-FINAL.jar" />	
+			
+		</fileset>
+		</copy>  
+		<!-- Shruti's  03032015 Tue  1:09 PM  email added by sahitya-->	
+		<copy todir="${sharedlib.dir}"  flatten="true">	
+		<fileset dir="${SignInService.dir}">
+			<include name="SignInService.jar" />
+		</fileset>
+		</copy>
+		
+		<!-- Bhupendra's  Wed 3/11/2015 3:52 PM  email - added by sahitya-->	
+		<copy todir="${sharedlib.dir}"  flatten="true">	
+		<fileset dir="${client.lib.dir}">
+			<include name="axis.jar"/>
+		</fileset>
+		</copy>
+		
+		<mkdir dir="${sharedlib.dir}/ResourceBundleService" />
+		<copy todir="${sharedlib.dir}/ResourceBundleService">
+            <fileset dir="${props.dir}" >
+            	<include name="**/ResourceBundleControl.properties"/>
+            </fileset>
+        </copy>
+
+	<echo message="Portlet value is ${Portlet}" />
+    <property name="Portlet" value="SharedLib"/>
+  
+     <!-- <tstamp>
+      <format property="BuildTime" pattern="yyyyMMdd'_'HHmm"/>
+    </tstamp> -->
+    
+    <mkdir dir="${archive.dir}/${Version}/${Region}/${Portlet}/${BuildTime}"/>
+    <copy todir="${archive.dir}/${Version}/${Region}/${Portlet}/${BuildTime}">
+          <fileset dir="${sharedlib.dir}" />
+    </copy>
+
+  </target>
+  
+  
+	<target name="ReceivingSharedLib" depends="prepare">
+	
+	<delete dir="${ReceivingSharedLib.dir}"/>
+	<mkdir dir="${ReceivingSharedLib.dir}"/>
+    <echo message="Portlet value is ${ReceivingSharedLib.dir}" />
+	<mkdir dir="${ReceivingSharedLib.dir}/ReceivingPortalServerConfig" />
+	
+		<!-- <copy todir="${ReceivingSharedLib.dir}" >
+			<fileset dir="${svn.comarch.workspace}/Common/WebOrderingClientLib/ReceivingClientLib/">
+				<include name="*.jar"/>
+			</fileset>
+		</copy> 02262014 Vignesh request Madhu-->
+	
+		<copy todir="${ReceivingSharedLib.dir}/ReceivingPortalServerConfig" >
+			<fileset dir="${svn.comarch.workspace}/Arch/WebOrderingPortal/ReceivingPortalServerConfig/">
+				<include name="**/*.properties"/>
+			</fileset>
+		</copy> 
+		
+		<mkdir dir="${archive.dir}/${Version}/${Region}/${Portlet}/${BuildTime}"/>
+		<copy todir="${archive.dir}/${Version}/${Region}/${Portlet}/${BuildTime}">
+			<fileset dir="${ReceivingSharedLib.dir}" />
+		</copy>
+	
+	</target>
+	
+	<!--IDBSharedLib for 13.3.0 -->
+	
+	<target name="IDBSharedLib" depends="prepare">
+	
+	<delete dir="${IDBSharedLib.dir}"/>
+	<mkdir dir="${IDBSharedLib.dir}"/>
+    <echo message="Portlet value is ${IDBSharedLib.dir}" />
+	<mkdir dir="${IDBSharedLib.dir}/IDBPortalServerConfig" />
+	
+		<copy todir="${IDBSharedLib.dir}" >
+			<fileset dir="${svn.comarch.workspace}/Common/WebOrderingClientLib/IDBClientLib/">
+				<include name="*.jar"/>
+			</fileset>
+		</copy>
+	
+		<copy todir="${IDBSharedLib.dir}/IDBPortalServerConfig" >
+			<fileset dir="${svn.comarch.workspace}/Arch/WebOrderingPortal/IDBPortalServerConfig/">
+				<include name="**/*.properties"/>
+			</fileset>
+		</copy> 
+		
+		<mkdir dir="${archive.dir}/${Version}/${Region}/${Portlet}/${BuildTime}"/>
+		<copy todir="${archive.dir}/${Version}/${Region}/${Portlet}/${BuildTime}">
+			<fileset dir="${IDBSharedLib.dir}" />
+		</copy>
+	
+	</target>
+  
+   
+	<target name="InvoiceAppSharedLib" depends="prepare">
+	
+	<delete dir="${InvoiceAppSharedLib.dir}"/>
+	<mkdir dir="${InvoiceAppSharedLib.dir}" />
+    <mkdir dir="${InvoiceAppSharedLib.dir}/InvoiceApprovalPortalServerConfig" />
+		
+	
+		<copy todir="${InvoiceAppSharedLib.dir}" >
+			<fileset dir="${svn.comarch.workspace}/Common/WebOrderingClientLib/InvoiceApprovalClientLib/">
+				<include name="*.jar"/>
+			</fileset>
+		</copy>
+	
+		<copy todir="${InvoiceAppSharedLib.dir}/InvoiceApprovalPortalServerConfig" >
+			<fileset dir="${svn.comarch.workspace}/Arch/WebOrderingPortal/InvoiceApprovalPortalServerConfig/">
+				<include name="**/*.properties"/>
+			</fileset>
+		</copy>	
+		
+		<mkdir dir="${archive.dir}/${Version}/${Region}/${Portlet}/${BuildTime}"/>
+		<copy todir="${archive.dir}/${Version}/${Region}/${Portlet}/${BuildTime}">
+			<fileset dir="${InvoiceAppSharedLib.dir}" />
+		</copy>
+		
+	</target>
+	
+	
+	<target name="PhysicalInvSharedLib" depends="prepare">
+	
+	<delete dir="${PhysicalInvSharedLib.dir}"/>
+	<mkdir dir="${PhysicalInvSharedLib.dir}" />
+    <mkdir dir="${PhysicalInvSharedLib.dir}/PhysicalInvPortalServerConfig" />
+		
+	
+		<!-- <copy todir="${PhysicalInvSharedLib.dir}" >
+			<fileset dir="${svn.comarch.workspace}/Common/WebOrderingClientLib/PhysicalInventoryClientLib/">
+				<include name="*.jar"/>
+			</fileset>
+		</copy> 02262014 Vignesh request Madhu-->
+	
+		<copy todir="${PhysicalInvSharedLib.dir}/PhysicalInvPortalServerConfig" >
+			<fileset dir="${svn.comarch.workspace}/Arch/WebOrderingPortal/PhysicalInvPortalServerConfig/">
+				<include name="**/*.properties"/>
+			</fileset>
+		</copy>	
+		
+		<mkdir dir="${archive.dir}/${Version}/${Region}/${Portlet}/${BuildTime}"/>
+		<copy todir="${archive.dir}/${Version}/${Region}/${Portlet}/${BuildTime}">
+			<fileset dir="${PhysicalInvSharedLib.dir}" />
+		</copy>
+		
+	</target>
+	
+	<!-- 10112013-->
+	<target name="ManageAccountGroupsSharedLib" depends="prepare">
+	
+	<delete dir="${ManageAccountGroupsSharedLib.dir}"/>
+	<mkdir dir="${ManageAccountGroupsSharedLib.dir}"/>
+    <echo message="Portlet value is ${ManageAccountGroupsSharedLib.dir}" />
+	<mkdir dir="${ManageAccountGroupsSharedLib.dir}/ManageAccountGroupsPortalServerConfig" />
+
+	<copy todir="${ManageAccountGroupsSharedLib.dir}/ManageAccountGroupsPortalServerConfig" >
+		<fileset dir="${svn.comarch.workspace}/Arch/WebOrderingPortal/ManageAccountGroupsPortalServerConfig/">
+			<include name="**/*.properties"/>
+		</fileset>
+	</copy> 
+		
+		<mkdir dir="${archive.dir}/${Version}/${Region}/${Portlet}/${BuildTime}"/>
+		<copy todir="${archive.dir}/${Version}/${Region}/${Portlet}/${BuildTime}">
+			<fileset dir="${ManageAccountGroupsSharedLib.dir}" />
+		</copy>
+	
+	</target>
+	
+	<!-- 10012013 IHSWebServer-->
+	 <target name="IHSWebServer" depends="prepare">
+ 
+        <echo message=" Running ${Portlet}."/> 					
+		<property name="Portlet" value="IHSWebServer"/>
+		
+		<copy todir="${IHSWebServer.dir}/" >
+			<fileset dir="${svn.comarch.workspace}/Arch/IHSWebServer/">				
+			</fileset>
+		</copy> 
+		
+		<mkdir dir="${archive.dir}/${Version}/${Region}/${Portlet}/${BuildTime}"/>
+		<copy todir="${archive.dir}/${Version}/${Region}/${Portlet}/${BuildTime}">
+			<fileset dir="${IHSWebServer.dir}" />
+		</copy>	
+
+		<copy todir="${fortify.src.dir}">
+			<fileset dir="${IHSWebServer.dir}"/>
+		</copy>
+		<antcall target="SCAcompile"/>
+    </target>
+	
+	<!-- no more needed 01302015 Madhu need from 02062015 again -->
+	<target name="EndecaSharedLib" depends="prepare">
+	
+	<delete dir="${EndecaSharedLib.dir}"/>
+	<mkdir dir="${EndecaSharedLib.dir}"/>
+    <echo message="Portlet value is ${EndecaSharedLib.dir}" />	
+		<copy todir="${EndecaSharedLib.dir}" >
+			<fileset dir="${svn.comarch.workspace}/Common/ThirdPartyLib/Endeca_2.1.0/">
+				<include name="*.jar"/>
+			</fileset>
+			
+			<fileset dir="${common.dest.dir}">
+				<include name="MEDEndecaUtilities.jar"/>						
+			</fileset>	
+		</copy>	
+	<mkdir dir="${archive.dir}/${Version}/${Region}/${Portlet}/${BuildTime}"/>
+		<copy todir="${archive.dir}/${Version}/${Region}/${Portlet}/${BuildTime}">
+			<fileset dir="${EndecaSharedLib.dir}" />
+		</copy>
+	
+	</target>
+	
+	<!-- SCA Compile Step -->
+	<target name="SCAcompile">
+		
+		<if name="RunSCA" value="Y">
+			<!-- HP Fortify Properties -->
+			<ant inheritAll="true" antfile="SCA.xml" target="SCACompile">					
+				<property name="sca.prj.name" value="${service.name}" />
+				<property name="sca.prj.wrkspc" value="${fortify.src.dir}" />
+				<property name="sca.prj.cp" value="${fortify.jars.dir}" />
+				<property name="sca.fort.dir" value="${root.dir}/Fortify" />
+				<property name="sca.token" value="${fortify.sca.token}" />
+			</ant>
+		<else>
+			<echo message="No SCA Compile" />
+		</else>
+		</if>
+	</target>
+
+</project>
